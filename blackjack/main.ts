@@ -1,17 +1,5 @@
-"use strict";
-class LanguageTexts {
-}
-LanguageTexts.language = "Language";
-LanguageTexts.english = "English";
-LanguageTexts.hungarian = "Hungarian";
-class English extends LanguageTexts {
-}
-class Hungarian extends LanguageTexts {
-}
-Hungarian.language = "Nyelv";
-Hungarian.english = "Angol";
-Hungarian.hungarian = "Magyar";
-const mainScreenHtml = `<div class="main-banner h-auto">
+const mainScreenHtml: string =
+`<div class="main-banner h-auto">
     <h1>♠ Black Jack ♠</h1>
 </div>
     <div class="game-area h-100 w-100 justify-content-center align-items-center">
@@ -24,14 +12,17 @@ const mainScreenHtml = `<div class="main-banner h-auto">
         <option value="hu">Hungarian</option>
     </select>
 </div>`;
-function main() {
+
+function main(): void {
     $("#page").empty();
     mainScreen();
 }
-function mainScreen() {
+
+function mainScreen(): void {
     $("#page").append(mainScreenHtml);
     $("#lang").on("change", (event) => {
-        console.log("Hello");
+        console.log("Hello")
     });
 }
+
 main();
