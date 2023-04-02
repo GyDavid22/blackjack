@@ -1,11 +1,25 @@
-.page {
+body {
     background-image: linear-gradient(to bottom, #004500, #008700);
     color: antiquewhite;
 }
 
-.main-banner > h1 {
-    margin: 0;
-    padding: 0.5rem;
-    text-align: center;
+.modal {
+    color: black;
+}
+
+.banner-text {
     font-family: 'Times New Roman', Times, serif;
+}
+
+.banner-text>h1 {
+    margin: 0;
+}
+
+a,
+a:visited {
+    color: antiquewhite;
+}
+
+a:hover {
+    color: darkgray;
 }
