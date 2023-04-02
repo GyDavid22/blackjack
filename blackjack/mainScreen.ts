@@ -1,13 +1,6 @@
-let language: LanguageTexts;
-getLanguage();
-
-function main(): void {
-    mainScreen();
-}
-
 function mainScreen(): void {
     $("#page").empty();
-    const mainScreenHtml: string =
+    let mainScreenHtml: string =
 `<header class="d-flex flex-column flex-md-row h-auto w-100">
 <div class="col-12 col-md-1 d-flex align-items-center justify-content-center justify-content-md-start p-1 p-md-0"><a href="#" data-bs-toggle="modal" data-bs-target="#changelog-modal" id="changelog-text">${language.changelog}</a></div>
 <div class="col-12 col-md-10 banner-text d-flex align-items-center justify-content-center p-1 p-md-0">
@@ -21,7 +14,9 @@ function mainScreen(): void {
     </select>
 </div>
 </header>
-<div class="h-100 d-flex justify-content-center align-items-center">${language.wip} 🛠️</div>
+<div class="h-100 d-flex justify-content-center align-items-center">
+    <button type="button" class="btn btn-primary" id="start-game-button">${language.startGame}</button>
+</div>
 <footer class="d-flex h-auto w-100">
 <div class="col-6 d-flex align-items-center"><a href="https://github.com/GyDavid22/blackjack">${language.github}</a></div>
 <div class="col-6 d-flex align-items-center justify-content-end">${language.author}, ${language.year}</div>
@@ -34,7 +29,7 @@ function mainScreen(): void {
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            <p>${LanguageTexts.lipsum}</p>
+            <p>${language.lipsum}</p>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-primary" data-bs-dismiss="modal">${language.ok}</button>
@@ -43,7 +38,7 @@ function mainScreen(): void {
 </div>
 </div>`;
     $("#page").append(mainScreenHtml);
-    $("#lang").on("change", (e) => {
+    $("#lang").on("change", async (e) => {
         let select = e.target as HTMLSelectElement;
         setLanguage(select.value);
         mainScreen();
@@ -51,31 +46,8 @@ function mainScreen(): void {
     $("#changelog-text").on("click", async (e) => {
         e.preventDefault();
     });
+    $("#start-game-button").on("click", async (e) => {
+        gameScreen();
+        //mainScreen();
+    });
 }
-
-function setLanguage(code: string | null) {
-    switch (code) {
-        case "en":
-            language = new English();
-            break;
-        case "hu":
-            language = new Hungarian();
-            break;
-        default:
-            language = new English();
-            code = "en";
-            break;
-    }
-    localStorage.setItem("language", code);
-}
-
-function getLanguage() {
-    let setLang = localStorage.getItem("language");
-    if (setLang == null) {
-        setLanguage(navigator.language);
-    } else {
-        setLanguage(setLang);
-    }
-}
-
-main();

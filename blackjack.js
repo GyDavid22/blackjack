@@ -1,4 +1,17 @@
 "use strict";
+function gameScreen() {
+    let gameScreenText = `<div class="h-100 d-flex justify-content-center align-items-center">
+<p id=countdown></p>
+</div>`;
+    $("#page").empty();
+    $("#page").append(gameScreenText);
+    for (let index = 0; index < 5; index++) {
+        setTimeout(() => {
+            $("#countdown").text(`${5 - index}`);
+        }, 1000 * index);
+    }
+    setTimeout(mainScreen, 5000);
+}
 class LanguageTexts {
     constructor() {
         this.language = "Language";
@@ -6,13 +19,14 @@ class LanguageTexts {
         this.hungarian = "Hungarian";
         this.changelog = "Changelog";
         this.wip = "Work in progress";
-        this.github = "Github";
+        this.github = "GitHub";
         this.author = "David Gyenes";
         this.year = "2023";
+        this.lipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc in pellentesque sem. Vestibulum semper purus sed nunc ultrices ullamcorper. Nullam blandit, lorem non rutrum volutpat, lacus magna dapibus ante, in tincidunt odio eros nec purus. Ut mattis rhoncus enim, quis ultrices mauris blandit ut. Proin hendrerit dictum egestas. Integer nec quam vel dui consectetur tempor sed sit amet est. Maecenas id libero non mi volutpat posuere a quis nisi. Maecenas eleifend semper nibh fringilla lobortis. Nulla hendrerit congue lorem, non facilisis nunc tempor ac. Duis at laoreet augue, at luctus leo. Sed libero ligula, posuere et arcu in, varius molestie ante. Vivamus porttitor suscipit ultrices. Fusce dapibus arcu a libero efficitur, ut commodo leo vulputate. Etiam et nisl sed dui tempor elementum. Mauris sit amet sapien mattis, finibus lacus scelerisque, venenatis erat. In vitae magna fringilla, varius nulla ac, cursus est. Proin luctus augue eget erat condimentum pharetra. Curabitur pharetra dui ut efficitur semper. Vestibulum metus nunc, tempus vel blandit at, maximus rutrum erat. Morbi dui ante, dapibus finibus ante vel, volutpat scelerisque libero. Duis non dapibus urna. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec tempor lorem a mauris consequat, cursus condimentum nunc dapibus. Aenean fermentum ex in felis tincidunt luctus. Etiam hendrerit enim sit amet pulvinar consectetur. Donec blandit venenatis posuere. Morbi tincidunt, ante eu tempor semper, felis dolor accumsan sapien, sed ornare ligula elit nec dolor. Cras vestibulum ipsum sed felis fringilla facilisis. Curabitur et fringilla est. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut vitae tincidunt augue. Suspendisse ultrices luctus dolor nec egestas. Aliquam vehicula efficitur purus ut sodales. Quisque volutpat turpis id augue interdum, quis cursus diam rutrum. In nec nunc libero. Vestibulum nec pellentesque eros, in viverra odio. Aliquam a ultrices dolor. Donec interdum nisi nec lectus tincidunt maximus. Nunc quis ligula vitae urna pulvinar interdum. Ut iaculis quis leo at posuere. Vivamus leo eros, egestas eget finibus non, ultrices non mauris. Nam lacinia velit elit, non interdum massa sagittis pulvinar. Mauris vel lorem massa. Aliquam condimentum nisl non ipsum interdum venenatis sit amet ac massa. Nulla facilisi. Aliquam at est lectus. In imperdiet, sapien id vehicula commodo, dui elit aliquet mi, vitae blandit felis odio at erat. Pellentesque quis fermentum nibh. Etiam sit amet scelerisque metus, eu aliquam lorem. Pellentesque gravida mollis ligula sed maximus. Fusce eu tempor est, ac congue libero. Fusce aliquam semper aliquet. Suspendisse sollicitudin in nisl vel eleifend.";
         this.ok = "Ok";
+        this.startGame = "Start game";
     }
 }
-LanguageTexts.lipsum = "";
 class English extends LanguageTexts {
 }
 class Hungarian extends LanguageTexts {
@@ -24,9 +38,9 @@ class Hungarian extends LanguageTexts {
         this.changelog = "Változásnapló";
         this.wip = "Fejlesztés alatt";
         this.author = "Gyenes Dávid";
+        this.startGame = "Játék";
     }
 }
-LanguageTexts.lipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc in pellentesque sem. Vestibulum semper purus sed nunc ultrices ullamcorper. Nullam blandit, lorem non rutrum volutpat, lacus magna dapibus ante, in tincidunt odio eros nec purus. Ut mattis rhoncus enim, quis ultrices mauris blandit ut. Proin hendrerit dictum egestas. Integer nec quam vel dui consectetur tempor sed sit amet est. Maecenas id libero non mi volutpat posuere a quis nisi. Maecenas eleifend semper nibh fringilla lobortis. Nulla hendrerit congue lorem, non facilisis nunc tempor ac. Duis at laoreet augue, at luctus leo. Sed libero ligula, posuere et arcu in, varius molestie ante. Vivamus porttitor suscipit ultrices. Fusce dapibus arcu a libero efficitur, ut commodo leo vulputate. Etiam et nisl sed dui tempor elementum. Mauris sit amet sapien mattis, finibus lacus scelerisque, venenatis erat. In vitae magna fringilla, varius nulla ac, cursus est. Proin luctus augue eget erat condimentum pharetra. Curabitur pharetra dui ut efficitur semper. Vestibulum metus nunc, tempus vel blandit at, maximus rutrum erat. Morbi dui ante, dapibus finibus ante vel, volutpat scelerisque libero. Duis non dapibus urna. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec tempor lorem a mauris consequat, cursus condimentum nunc dapibus. Aenean fermentum ex in felis tincidunt luctus. Etiam hendrerit enim sit amet pulvinar consectetur. Donec blandit venenatis posuere. Morbi tincidunt, ante eu tempor semper, felis dolor accumsan sapien, sed ornare ligula elit nec dolor. Cras vestibulum ipsum sed felis fringilla facilisis. Curabitur et fringilla est. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut vitae tincidunt augue. Suspendisse ultrices luctus dolor nec egestas. Aliquam vehicula efficitur purus ut sodales. Quisque volutpat turpis id augue interdum, quis cursus diam rutrum. In nec nunc libero. Vestibulum nec pellentesque eros, in viverra odio. Aliquam a ultrices dolor. Donec interdum nisi nec lectus tincidunt maximus. Nunc quis ligula vitae urna pulvinar interdum. Ut iaculis quis leo at posuere. Vivamus leo eros, egestas eget finibus non, ultrices non mauris. Nam lacinia velit elit, non interdum massa sagittis pulvinar. Mauris vel lorem massa. Aliquam condimentum nisl non ipsum interdum venenatis sit amet ac massa. Nulla facilisi. Aliquam at est lectus. In imperdiet, sapien id vehicula commodo, dui elit aliquet mi, vitae blandit felis odio at erat. Pellentesque quis fermentum nibh. Etiam sit amet scelerisque metus, eu aliquam lorem. Pellentesque gravida mollis ligula sed maximus. Fusce eu tempor est, ac congue libero. Fusce aliquam semper aliquet. Suspendisse sollicitudin in nisl vel eleifend.";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,14 +50,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-let language;
-getLanguage();
-function main() {
-    mainScreen();
-}
 function mainScreen() {
     $("#page").empty();
-    const mainScreenHtml = `<header class="d-flex flex-column flex-md-row h-auto w-100">
+    let mainScreenHtml = `<header class="d-flex flex-column flex-md-row h-auto w-100">
 <div class="col-12 col-md-1 d-flex align-items-center justify-content-center justify-content-md-start p-1 p-md-0"><a href="#" data-bs-toggle="modal" data-bs-target="#changelog-modal" id="changelog-text">${language.changelog}</a></div>
 <div class="col-12 col-md-10 banner-text d-flex align-items-center justify-content-center p-1 p-md-0">
     <h1>♠ Black Jack ♠</h1>
@@ -56,7 +65,9 @@ function mainScreen() {
     </select>
 </div>
 </header>
-<div class="h-100 d-flex justify-content-center align-items-center">${language.wip} 🛠️</div>
+<div class="h-100 d-flex justify-content-center align-items-center">
+    <button type="button" class="btn btn-primary" id="start-game-button">${language.startGame}</button>
+</div>
 <footer class="d-flex h-auto w-100">
 <div class="col-6 d-flex align-items-center"><a href="https://github.com/GyDavid22/blackjack">${language.github}</a></div>
 <div class="col-6 d-flex align-items-center justify-content-end">${language.author}, ${language.year}</div>
@@ -69,7 +80,7 @@ function mainScreen() {
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            <p>${LanguageTexts.lipsum}</p>
+            <p>${language.lipsum}</p>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-primary" data-bs-dismiss="modal">${language.ok}</button>
@@ -78,14 +89,23 @@ function mainScreen() {
 </div>
 </div>`;
     $("#page").append(mainScreenHtml);
-    $("#lang").on("change", (e) => {
+    $("#lang").on("change", (e) => __awaiter(this, void 0, void 0, function* () {
         let select = e.target;
         setLanguage(select.value);
         mainScreen();
-    });
+    }));
     $("#changelog-text").on("click", (e) => __awaiter(this, void 0, void 0, function* () {
         e.preventDefault();
     }));
+    $("#start-game-button").on("click", (e) => __awaiter(this, void 0, void 0, function* () {
+        gameScreen();
+        //mainScreen();
+    }));
+}
+let language;
+getLanguage();
+function main() {
+    mainScreen();
 }
 function setLanguage(code) {
     switch (code) {
