@@ -2,7 +2,7 @@ let language: LanguageTexts;
 getLanguage();
 
 function main(): void {
-    mainScreen();
+    screenSwitch(mainScreen, true);
 }
 
 function setLanguage(code: string | null) {
@@ -28,6 +28,34 @@ function getLanguage() {
     } else {
         setLanguage(setLang);
     }
+}
+
+function screenSwitch(nextScreen: Function, justIn: Boolean = false): void {
+    if (justIn) {
+        fadeIn();
+        nextScreen();
+    } else {
+        fadeOutAndNext(nextScreen);
+    }
+}
+
+function fadeIn(): void {
+    $("#page").addClass("animate__animated animate__fadeIn");
+    $("#page").on("animationend", () => {
+        $("#page").off();
+        $("#page").removeClass("animate__animated animate__fadeIn");
+    });
+}
+
+function fadeOutAndNext(nextScreen: Function): void {
+    $("#page").addClass("animate__animated animate__fadeOut");
+    $("#page").on("animationend", () => {
+        $("#page").off();
+        $("#page").empty();
+        $("#page").removeClass("animate__animated animate__fadeOut");
+        fadeIn();
+        nextScreen();
+    });
 }
 
 main();

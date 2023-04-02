@@ -10,7 +10,7 @@ function gameScreen() {
             $("#countdown").text(`${5 - index}`);
         }, 1000 * index);
     }
-    setTimeout(mainScreen, 5000);
+    setTimeout(() => { screenSwitch(mainScreen); }, 5000);
 }
 class LanguageTexts {
     constructor() {
@@ -51,7 +51,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 function mainScreen() {
-    $("#page").empty();
     let mainScreenHtml = `<header class="d-flex flex-column flex-md-row h-auto w-100">
 <div class="col-12 col-md-1 d-flex align-items-center justify-content-center justify-content-md-start p-1 p-md-0"><a href="#" data-bs-toggle="modal" data-bs-target="#changelog-modal" id="changelog-text">${language.changelog}</a></div>
 <div class="col-12 col-md-10 banner-text d-flex align-items-center justify-content-center p-1 p-md-0">
@@ -65,9 +64,7 @@ function mainScreen() {
     </select>
 </div>
 </header>
-<div class="h-100 d-flex justify-content-center align-items-center">
-    <button type="button" class="btn btn-primary" id="start-game-button">${language.startGame}</button>
-</div>
+<div class="h-100 d-flex justify-content-center align-items-center">${language.wip} 🛠️</div>
 <footer class="d-flex h-auto w-100">
 <div class="col-6 d-flex align-items-center"><a href="https://github.com/GyDavid22/blackjack">${language.github}</a></div>
 <div class="col-6 d-flex align-items-center justify-content-end">${language.author}, ${language.year}</div>
@@ -90,22 +87,23 @@ function mainScreen() {
 </div>`;
     $("#page").append(mainScreenHtml);
     $("#lang").on("change", (e) => __awaiter(this, void 0, void 0, function* () {
+        $("#lang").off();
         let select = e.target;
         setLanguage(select.value);
+        $("#page").empty();
         mainScreen();
     }));
     $("#changelog-text").on("click", (e) => __awaiter(this, void 0, void 0, function* () {
         e.preventDefault();
     }));
     $("#start-game-button").on("click", (e) => __awaiter(this, void 0, void 0, function* () {
-        gameScreen();
-        //mainScreen();
+        screenSwitch(gameScreen);
     }));
 }
 let language;
 getLanguage();
 function main() {
-    mainScreen();
+    screenSwitch(mainScreen, true);
 }
 function setLanguage(code) {
     switch (code) {
@@ -130,5 +128,31 @@ function getLanguage() {
     else {
         setLanguage(setLang);
     }
+}
+function screenSwitch(nextScreen, justIn = false) {
+    if (justIn) {
+        fadeIn();
+        nextScreen();
+    }
+    else {
+        fadeOutAndNext(nextScreen);
+    }
+}
+function fadeIn() {
+    $("#page").addClass("animate__animated animate__fadeIn");
+    $("#page").on("animationend", () => {
+        $("#page").off();
+        $("#page").removeClass("animate__animated animate__fadeIn");
+    });
+}
+function fadeOutAndNext(nextScreen) {
+    $("#page").addClass("animate__animated animate__fadeOut");
+    $("#page").on("animationend", () => {
+        $("#page").off();
+        $("#page").empty();
+        $("#page").removeClass("animate__animated animate__fadeOut");
+        fadeIn();
+        nextScreen();
+    });
 }
 main();

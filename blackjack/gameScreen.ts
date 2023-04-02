@@ -10,5 +10,5 @@ function gameScreen(): void {
             $("#countdown").text(`${5 - index}`);
         }, 1000 * index);
     }
-    setTimeout(mainScreen, 5000);
+    setTimeout(() => {screenSwitch(mainScreen);}, 5000);
 }
