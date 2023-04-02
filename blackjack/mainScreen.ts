@@ -13,7 +13,9 @@ function mainScreen(): void {
     </select>
 </div>
 </header>
-<div class="h-100 d-flex justify-content-center align-items-center">${language.wip} 🛠️</div>
+<div class="h-100 d-flex justify-content-center align-items-center">
+<button type="button" class="btn btn-primary" id="start-game-button">${language.startGame}</button>
+</div>
 <footer class="d-flex h-auto w-100">
 <div class="col-6 d-flex align-items-center"><a href="https://github.com/GyDavid22/blackjack">${language.github}</a></div>
 <div class="col-6 d-flex align-items-center justify-content-end">${language.author}, ${language.year}</div>
