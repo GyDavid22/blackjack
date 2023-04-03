@@ -1,10 +1,6 @@
 let language: LanguageTexts;
 getLanguage();
 
-function main(): void {
-    screenSwitch(mainScreen, true);
-}
-
 function setLanguage(code: string | null) {
     switch (code) {
         case "en":
@@ -58,4 +54,4 @@ function fadeOutAndNext(nextScreen: Function): void {
     });
 }
 
-main();
+screenSwitch(mainScreen, true);

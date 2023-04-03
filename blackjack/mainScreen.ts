@@ -3,7 +3,7 @@ function mainScreen(): void {
 `<header class="d-flex flex-column flex-md-row h-auto w-100">
 <div class="col-12 col-md-1 d-flex align-items-center justify-content-center justify-content-md-start p-1 p-md-0"><a href="#" data-bs-toggle="modal" data-bs-target="#changelog-modal" id="changelog-text">${language.changelog}</a></div>
 <div class="col-12 col-md-10 banner-text d-flex align-items-center justify-content-center p-1 p-md-0">
-    <h1>♠ Black Jack ♠</h1>
+    <h1>♠ Blackjack ♠</h1>
 </div>
 <div class="col-12 col-md-1 d-flex align-items-center justify-content-center justify-content-md-end p-1 p-md-0" id="langselector">
     <select class="form-select-sm" id="lang" title="language">

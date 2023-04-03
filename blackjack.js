@@ -1,10 +1,26 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+function newDeck() {
+    return __awaiter(this, void 0, void 0, function* () {
+        return fetch("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1")
+            .then((r) => r.json()).then((r) => r);
+    });
+}
 function gameScreen() {
     let gameScreenText = `<div class="h-100 d-flex justify-content-center align-items-center">
 <p id=countdown></p>
 </div>`;
     $("#page").empty();
     $("#page").append(gameScreenText);
+    console.log(newDeck());
     for (let index = 0; index < 5; index++) {
         setTimeout(() => {
             $("#countdown").text(`${5 - index}`);
@@ -41,20 +57,11 @@ class Hungarian extends LanguageTexts {
         this.startGame = "Játék";
     }
 }
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 function mainScreen() {
     let mainScreenHtml = `<header class="d-flex flex-column flex-md-row h-auto w-100">
 <div class="col-12 col-md-1 d-flex align-items-center justify-content-center justify-content-md-start p-1 p-md-0"><a href="#" data-bs-toggle="modal" data-bs-target="#changelog-modal" id="changelog-text">${language.changelog}</a></div>
 <div class="col-12 col-md-10 banner-text d-flex align-items-center justify-content-center p-1 p-md-0">
-    <h1>♠ Black Jack ♠</h1>
+    <h1>♠ Blackjack ♠</h1>
 </div>
 <div class="col-12 col-md-1 d-flex align-items-center justify-content-center justify-content-md-end p-1 p-md-0" id="langselector">
     <select class="form-select-sm" id="lang" title="language">
@@ -104,9 +111,6 @@ function mainScreen() {
 }
 let language;
 getLanguage();
-function main() {
-    screenSwitch(mainScreen, true);
-}
 function setLanguage(code) {
     switch (code) {
         case "en":
@@ -157,4 +161,4 @@ function fadeOutAndNext(nextScreen) {
         nextScreen();
     });
 }
-main();
+screenSwitch(mainScreen, true);
