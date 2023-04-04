@@ -23,7 +23,7 @@ interface Card {
     suit: string;
 }
 
-async function newDeck() : Promise<DeckResponse> {
-    return fetch("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1")
-        .then((r) => r.json()).catch(() => errorMessageDeckOfCardsApi());;
+async function newDeck(count: number = 1) : Promise<DeckResponse> {
+    return fetch(`https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=${count}`)
+        .then((r) => r.json()).catch(() => errorMessageDeckOfCardsApi());
 }

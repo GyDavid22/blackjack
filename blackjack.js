@@ -8,43 +8,81 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-function newDeck() {
+function newDeck(count = 1) {
     return __awaiter(this, void 0, void 0, function* () {
-        return fetch("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1")
+        return fetch(`https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=${count}`)
             .then((r) => r.json()).catch(() => errorMessageDeckOfCardsApi());
-        ;
     });
 }
 class Game {
+    ;
+    ;
     constructor(deck) {
-        this.deck = deck;
         this.userHand = new Array();
         this.dealerHand = new Array();
+        this.cardCount = 0;
+        this.deck = deck;
         this.remaining = deck.remaining;
-        console.log(deck);
-        this.pickCard(2, this.userHand);
-        this.pickCard(2, this.dealerHand);
+        this.putCardToContainer("PLAYER", 2);
+        this.putCardToContainer("DEALER", 2);
     }
     pickCard(count, hand) {
         return __awaiter(this, void 0, void 0, function* () {
-            fetch(`https://deckofcardsapi.com/api/deck/${this.deck.deck_id}/draw/?count=${count}`)
+            let cards = new Array();
+            yield fetch(`https://deckofcardsapi.com/api/deck/${this.deck.deck_id}/draw/?count=${count}`)
                 .then((r) => r.json()).then((r) => {
                 this.remaining = this.remaining < r.remaining ? this.remaining : r.remaining;
                 for (let index = 0; index < r.cards.length; index++) {
                     hand.push(r.cards[index]);
-                    console.log(r.cards[index]);
+                    cards.push(r.cards[index]);
                 }
             }).catch(() => errorMessageDeckOfCardsApi());
+            return cards;
+        });
+    }
+    putCardToContainer(container, count) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let hand;
+            let animation;
+            switch (container) {
+                case "DEALER":
+                    hand = this.dealerHand;
+                    animation = "fadeInUp";
+                    break;
+                case "PLAYER":
+                    hand = this.userHand;
+                    animation = "fadeInDown";
+                    break;
+                default:
+                    hand = new Array();
+                    animation = "";
+                    break;
+            }
+            let cards = yield this.pickCard(count, hand);
+            for (let index = 0; index < cards.length; index++) {
+                $(`#${container.toLowerCase()}_container`).append(`<img src="${cards[index].image}" class="animate__animated animate__${animation}" id="card_${this.cardCount}">`);
+                let myCount = this.cardCount;
+                let myAnimation = animation;
+                $(`#card_${this.cardCount}`).on("animationend", () => {
+                    $(`#card_${myCount}`).off();
+                    $(`#card_${myCount}`).removeClass(`animate__animated animate__${myAnimation}`);
+                    console.log(`#card_${myCount} animate__animated animate__${myAnimation}`);
+                });
+                this.cardCount++;
+            }
         });
     }
 }
 function gameScreen() {
-    let gameScreenText = `<div class="h-100 d-flex justify-content-center align-items-center">
-<p id=countdown></p>
+    let gameScreenText = `<div class="h-auto d-flex justify-content-center align-items-center" id="dealer_container">
+</div>
+<div class="h-100 d-flex justify-content-center align-items-center">
+    <p id=countdown></p>
+</div>
+<div class="h-auto d-flex justify-content-center align-items-center" id="player_container">
 </div>`;
-    $("#page").empty();
     $("#page").append(gameScreenText);
-    newDeck().then((r) => new Game(r));
+    newDeck(1).then((r) => new Game(r));
     for (let index = 0; index < 5; index++) {
         setTimeout(() => {
             $("#countdown").text(`${5 - index}`);
