@@ -27,6 +27,7 @@ function getLanguage() {
 }
 
 function screenSwitch(nextScreen: Function, justIn: Boolean = false): void {
+    $(".modal-backdrop").remove();
     if (justIn) {
         fadeIn();
         nextScreen();

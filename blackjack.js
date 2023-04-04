@@ -164,6 +164,7 @@ function getLanguage() {
     }
 }
 function screenSwitch(nextScreen, justIn = false) {
+    $(".modal-backdrop").remove();
     if (justIn) {
         fadeIn();
         nextScreen();
