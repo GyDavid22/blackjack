@@ -8,7 +8,7 @@ interface DeckResponse {
 interface CardResponse {
     success: boolean; 
     deck_id: string;
-    cards: Card[];
+    cards: Array<Card>;
     remaining: number;
 }
 
@@ -25,5 +25,5 @@ interface Card {
 
 async function newDeck() : Promise<DeckResponse> {
     return fetch("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1")
-    .then((r) => r.json()).then((r) => r as DeckResponse);
+        .then((r) => r.json()).catch(() => errorMessageDeckOfCardsApi());;
 }

@@ -5,7 +5,7 @@ function gameScreen(): void {
 </div>`;
     $("#page").empty();
     $("#page").append(gameScreenText);
-    console.log(newDeck());
+    newDeck().then((r) => new Game(r));
     for (let index = 0; index < 5; index++) {
         setTimeout(() => {
             $("#countdown").text(`${5 - index}`);
