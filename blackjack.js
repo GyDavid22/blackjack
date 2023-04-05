@@ -23,8 +23,12 @@ class Game {
         this.cardCount = 0;
         this.deck = deck;
         this.remaining = deck.remaining;
-        this.putCardToContainer("PLAYER", 2);
-        this.putCardToContainer("DEALER", 2);
+        this.putCardToContainer("PLAYER", 2).then(() => {
+            console.log(this.getHandValue(this.userHand));
+        });
+        this.putCardToContainer("DEALER", 2).then(() => {
+            console.log(this.getHandValue(this.dealerHand));
+        });
     }
     pickCard(count, hand) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -32,9 +36,9 @@ class Game {
             yield fetch(`https://deckofcardsapi.com/api/deck/${this.deck.deck_id}/draw/?count=${count}`)
                 .then((r) => r.json()).then((r) => {
                 this.remaining = this.remaining < r.remaining ? this.remaining : r.remaining;
-                for (let index = 0; index < r.cards.length; index++) {
-                    hand.push(r.cards[index]);
-                    cards.push(r.cards[index]);
+                for (let i = 0; i < r.cards.length; i++) {
+                    hand.push(r.cards[i]);
+                    cards.push(r.cards[i]);
                 }
             }).catch(() => errorMessageDeckOfCardsApi());
             return cards;
@@ -54,23 +58,43 @@ class Game {
                     animation = "fadeInDown";
                     break;
                 default:
-                    hand = new Array();
-                    animation = "";
-                    break;
+                    return;
             }
             let cards = yield this.pickCard(count, hand);
-            for (let index = 0; index < cards.length; index++) {
-                $(`#${container.toLowerCase()}_container`).append(`<img src="${cards[index].image}" class="animate__animated animate__${animation}" id="card_${this.cardCount}">`);
-                let myCount = this.cardCount;
-                let myAnimation = animation;
-                $(`#card_${this.cardCount}`).on("animationend", () => {
-                    $(`#card_${myCount}`).off();
-                    $(`#card_${myCount}`).removeClass(`animate__animated animate__${myAnimation}`);
-                    console.log(`#card_${myCount} animate__animated animate__${myAnimation}`);
+            for (let i = 0; i < cards.length; i++) {
+                $(`#${container.toLowerCase()}_container`).append(`<img src="${cards[i].image}" class="animate__animated animate__${animation}" id="card_${this.cardCount}">`);
+                let me = $(`#card_${this.cardCount}`);
+                me.on("animationend", () => {
+                    me.off();
+                    me.removeClass(`animate__animated animate__${animation}`);
                 });
                 this.cardCount++;
             }
         });
+    }
+    getHandValue(hand) {
+        let sumValue = 0;
+        let aces = 0;
+        for (let i = 0; i < hand.length; i++) {
+            if (hand[i].value === "KING" || hand[i].value === "QUEEN" || hand[i].value === "JACK") {
+                sumValue += 10;
+            }
+            else if (hand[i].value === "ACE") {
+                sumValue += 11;
+                aces++;
+            }
+            else {
+                sumValue += Number.parseInt(hand[i].value);
+            }
+        }
+        if (sumValue > 21) {
+            let i = 0;
+            while (sumValue > 21 && i < aces) {
+                sumValue -= 10;
+                i++;
+            }
+        }
+        return sumValue;
     }
 }
 function gameScreen() {
@@ -81,12 +105,12 @@ function gameScreen() {
 </div>
 <div class="h-auto d-flex justify-content-center align-items-center" id="player_container">
 </div>`;
-    $("#page").append(gameScreenText);
+    pageDiv.append(gameScreenText);
     newDeck(1).then((r) => new Game(r));
-    for (let index = 0; index < 5; index++) {
+    for (let i = 0; i < 5; i++) {
         setTimeout(() => {
-            $("#countdown").text(`${5 - index}`);
-        }, 1000 * index);
+            $("#countdown").text(`${5 - i}`);
+        }, 1000 * i);
     }
     setTimeout(() => { screenSwitch(mainScreen); }, 5000);
 }
@@ -160,22 +184,26 @@ function mainScreen() {
     </div>
 </div>
 </div>`;
-    $("#page").append(mainScreenHtml);
-    $("#lang").on("change", (e) => __awaiter(this, void 0, void 0, function* () {
-        $("#lang").off();
+    pageDiv.append(mainScreenHtml);
+    let lang = $("#lang");
+    lang.on("change", (e) => __awaiter(this, void 0, void 0, function* () {
+        lang.off();
         let select = e.target;
         setLanguage(select.value);
-        $("#page").empty();
+        pageDiv.empty();
         mainScreen();
     }));
     $("#changelog-text").on("click", (e) => __awaiter(this, void 0, void 0, function* () {
         e.preventDefault();
     }));
-    $("#start-game-button").on("click", (e) => __awaiter(this, void 0, void 0, function* () {
+    let startGameButton = $("#start-game-button");
+    startGameButton.on("click", (e) => __awaiter(this, void 0, void 0, function* () {
+        startGameButton.off(); // To prevent multiple clicks until the animation isn't finished
         screenSwitch(gameScreen);
     }));
 }
 let language;
+let pageDiv = $("#page");
 getLanguage();
 function setLanguage(code) {
     switch (code) {
@@ -212,18 +240,18 @@ function screenSwitch(nextScreen, justIn = false) {
     }
 }
 function fadeIn() {
-    $("#page").addClass("animate__animated animate__fadeIn");
-    $("#page").on("animationend", () => {
-        $("#page").off();
-        $("#page").removeClass("animate__animated animate__fadeIn");
+    pageDiv.addClass("animate__animated animate__fadeIn");
+    pageDiv.on("animationend", () => {
+        pageDiv.off();
+        pageDiv.removeClass("animate__animated animate__fadeIn");
     });
 }
 function fadeOutAndNext(nextScreen) {
-    $("#page").addClass("animate__animated animate__fadeOut");
-    $("#page").on("animationend", () => {
-        $("#page").off();
-        $("#page").empty();
-        $("#page").removeClass("animate__animated animate__fadeOut");
+    pageDiv.addClass("animate__animated animate__fadeOut");
+    pageDiv.on("animationend", () => {
+        pageDiv.off();
+        pageDiv.empty();
+        pageDiv.removeClass("animate__animated animate__fadeOut");
         fadeIn();
         nextScreen();
     });
@@ -247,11 +275,12 @@ function errorMessageDeckOfCardsApi() {
 <button data-bs-toggle="modal" data-bs-target="#error-modal" id="hidden-opener" hidden></button>
 </div>
 `;
-    $("#page").append(errorModal);
+    pageDiv.append(errorModal);
     $("#hidden-opener").click();
-    $("#error-modal").on("hidden.bs.modal", () => {
-        $("#error-modal").off();
-        $("#error-modal").remove();
+    let errorModalDiv = $("#error-modal");
+    errorModalDiv.on("hidden.bs.modal", () => {
+        errorModalDiv.off();
+        errorModalDiv.remove();
     });
 }
 screenSwitch(mainScreen, true);

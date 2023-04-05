@@ -36,18 +36,21 @@ function mainScreen(): void {
     </div>
 </div>
 </div>`;
-    $("#page").append(mainScreenHtml);
-    $("#lang").on("change", async (e) => {
-        $("#lang").off();
+    pageDiv.append(mainScreenHtml);
+    let lang = $("#lang");
+    lang.on("change", async (e) => {
+        lang.off();
         let select = e.target as HTMLSelectElement;
         setLanguage(select.value);
-        $("#page").empty();
+        pageDiv.empty();
         mainScreen();
     });
     $("#changelog-text").on("click", async (e) => {
         e.preventDefault();
     });
-    $("#start-game-button").on("click", async (e) => {
+    let startGameButton = $("#start-game-button");
+    startGameButton.on("click", async (e) => {
+        startGameButton.off(); // To prevent multiple clicks until the animation isn't finished
         screenSwitch(gameScreen);
     });
 }

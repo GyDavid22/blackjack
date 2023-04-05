@@ -1,4 +1,5 @@
 let language: LanguageTexts;
+let pageDiv = $("#page");
 getLanguage();
 
 function setLanguage(code: string | null) {
@@ -37,19 +38,19 @@ function screenSwitch(nextScreen: Function, justIn: Boolean = false): void {
 }
 
 function fadeIn(): void {
-    $("#page").addClass("animate__animated animate__fadeIn");
-    $("#page").on("animationend", () => {
-        $("#page").off();
-        $("#page").removeClass("animate__animated animate__fadeIn");
+    pageDiv.addClass("animate__animated animate__fadeIn");
+    pageDiv.on("animationend", () => {
+        pageDiv.off();
+        pageDiv.removeClass("animate__animated animate__fadeIn");
     });
 }
 
 function fadeOutAndNext(nextScreen: Function): void {
-    $("#page").addClass("animate__animated animate__fadeOut");
-    $("#page").on("animationend", () => {
-        $("#page").off();
-        $("#page").empty();
-        $("#page").removeClass("animate__animated animate__fadeOut");
+    pageDiv.addClass("animate__animated animate__fadeOut");
+    pageDiv.on("animationend", () => {
+        pageDiv.off();
+        pageDiv.empty();
+        pageDiv.removeClass("animate__animated animate__fadeOut");
         fadeIn();
         nextScreen();
     });
@@ -75,11 +76,12 @@ function errorMessageDeckOfCardsApi() {
 <button data-bs-toggle="modal" data-bs-target="#error-modal" id="hidden-opener" hidden></button>
 </div>
 `
-    $("#page").append(errorModal);
+    pageDiv.append(errorModal);
     $("#hidden-opener").click();
-    $("#error-modal").on("hidden.bs.modal", () => {
-        $("#error-modal").off();
-        $("#error-modal").remove();
+    let errorModalDiv = $("#error-modal");
+    errorModalDiv.on("hidden.bs.modal", () => {
+        errorModalDiv.off();
+        errorModalDiv.remove();
     })
 }
 

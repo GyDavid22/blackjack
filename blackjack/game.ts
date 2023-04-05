@@ -8,8 +8,12 @@ class Game {
     public constructor(deck: DeckResponse) {
         this.deck = deck;
         this.remaining = deck.remaining;
-        this.putCardToContainer("PLAYER", 2);
-        this.putCardToContainer("DEALER", 2);
+        this.putCardToContainer("PLAYER", 2).then(() => {
+            console.log(this.getHandValue(this.userHand));
+        });
+        this.putCardToContainer("DEALER", 2).then(() => {
+            console.log(this.getHandValue(this.dealerHand));
+        });
     }
 
     private async pickCard(count: Number, hand: Array<Card>): Promise<Array<Card>> {
@@ -17,9 +21,9 @@ class Game {
         await fetch(`https://deckofcardsapi.com/api/deck/${this.deck.deck_id}/draw/?count=${count}`)
             .then((r) => r.json() as Promise<CardResponse>).then((r) => {
                 this.remaining = this.remaining < r.remaining ? this.remaining : r.remaining;
-                for (let index = 0; index < r.cards.length; index++) {
-                    hand.push(r.cards[index]);
-                    cards.push(r.cards[index]);
+                for (let i = 0; i < r.cards.length; i++) {
+                    hand.push(r.cards[i]);
+                    cards.push(r.cards[i]);
                 }
             }).catch(() => errorMessageDeckOfCardsApi());
         return cards;
@@ -38,21 +42,40 @@ class Game {
                 animation = "fadeInDown";
                 break;
             default:
-                hand = new Array<Card>();
-                animation = "";
-                break;
+                return;
         }
         let cards = await this.pickCard(count, hand);
-        for (let index = 0; index < cards.length; index++) {
-            $(`#${container.toLowerCase()}_container`).append(`<img src="${cards[index].image}" class="animate__animated animate__${animation}" id="card_${this.cardCount}">`);
-            let myCount = this.cardCount;
-            let myAnimation = animation;
-            $(`#card_${this.cardCount}`).on("animationend", () => {
-                $(`#card_${myCount}`).off();
-                $(`#card_${myCount}`).removeClass(`animate__animated animate__${myAnimation}`);
-                console.log(`#card_${myCount} animate__animated animate__${myAnimation}`);
+        for (let i = 0; i < cards.length; i++) {
+            $(`#${container.toLowerCase()}_container`).append(`<img src="${cards[i].image}" class="animate__animated animate__${animation}" id="card_${this.cardCount}">`);
+            let me = $(`#card_${this.cardCount}`);
+            me.on("animationend", () => {
+                me.off();
+                me.removeClass(`animate__animated animate__${animation}`);
             });
             this.cardCount++;
         }
+    }
+
+    public getHandValue(hand: Array<Card>): number {
+        let sumValue = 0;
+        let aces = 0;
+        for (let i = 0; i < hand.length; i++) {
+            if (hand[i].value === "KING" || hand[i].value === "QUEEN" || hand[i].value === "JACK") {
+                sumValue += 10;
+            } else if (hand[i].value === "ACE") {
+                sumValue += 11;
+                aces++;
+            } else {
+                sumValue += Number.parseInt(hand[i].value);
+            }
+        }
+        if (sumValue > 21) {
+            let i = 0;
+            while (sumValue > 21 && i < aces) {
+                sumValue -= 10;
+                i++;
+            }
+        }
+        return sumValue;
     }
 }

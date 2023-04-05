@@ -7,12 +7,12 @@ function gameScreen(): void {
 </div>
 <div class="h-auto d-flex justify-content-center align-items-center" id="player_container">
 </div>`;
-    $("#page").append(gameScreenText);
+    pageDiv.append(gameScreenText);
     newDeck(1).then((r) => new Game(r));
-    for (let index = 0; index < 5; index++) {
+    for (let i = 0; i < 5; i++) {
         setTimeout(() => {
-            $("#countdown").text(`${5 - index}`);
-        }, 1000 * index);
+            $("#countdown").text(`${5 - i}`);
+        }, 1000 * i);
     }
     setTimeout(() => {screenSwitch(mainScreen);}, 5000);
 }
