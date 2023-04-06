@@ -23,18 +23,17 @@ class Game {
         this.cardCount = 0;
         this.deck = deck;
         this.remaining = deck.remaining;
-        this.putCardToContainer("PLAYER", 2).then(() => {
-            console.log(this.getHandValue(this.userHand));
-        });
-        this.putCardToContainer("DEALER", 2).then(() => {
-            console.log(this.getHandValue(this.dealerHand));
-        });
+        this.putCardToContainer("PLAYER", 2);
+        this.putCardToContainer("DEALER", 2);
     }
     pickCard(count, hand) {
         return __awaiter(this, void 0, void 0, function* () {
             let cards = new Array();
             yield fetch(`https://deckofcardsapi.com/api/deck/${this.deck.deck_id}/draw/?count=${count}`)
                 .then((r) => r.json()).then((r) => {
+                if (this.remaining === r.remaining) {
+                    throw new Error(); // Probably we got the same response more times, happened during testing
+                }
                 this.remaining = this.remaining < r.remaining ? this.remaining : r.remaining;
                 for (let i = 0; i < r.cards.length; i++) {
                     hand.push(r.cards[i]);
@@ -42,6 +41,43 @@ class Game {
                 }
             }).catch(() => errorMessageDeckOfCardsApi());
             return cards;
+        });
+    }
+    hit() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.putCardToContainer("PLAYER", 1);
+            let value = this.getHandValue(this.userHand);
+            if (value <= 21) {
+                // console.log(`You're good: ${value}`);
+            }
+            else {
+                // console.log(`You're f*cked: ${value}`);
+            }
+        });
+    }
+    stand() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.dealerMove();
+        });
+    }
+    dealerMove() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.getHandValue(this.dealerHand) <= this.getHandValue(this.userHand) && this.getHandValue(this.dealerHand) < 21) {
+                setTimeout(() => __awaiter(this, void 0, void 0, function* () {
+                    yield this.putCardToContainer("DEALER", 1);
+                    let value = this.getHandValue(this.dealerHand);
+                    if (value <= 21) {
+                        console.log(`Dealer's good: ${value}`);
+                    }
+                    else {
+                        console.log(`Dealer's f*cked: ${value}`);
+                    }
+                    this.dealerMove();
+                }), 1000);
+            }
+            else {
+                console.log("Time to evaluate");
+            }
         });
     }
     putCardToContainer(container, count) {
@@ -97,22 +133,20 @@ class Game {
         return sumValue;
     }
 }
+let gameDebug;
 function gameScreen() {
     let gameScreenText = `<div class="h-auto d-flex justify-content-center align-items-center" id="dealer_container">
 </div>
 <div class="h-100 d-flex justify-content-center align-items-center">
-    <p id=countdown></p>
+<button type="button" class="btn btn-primary" id="return-button">Return</button>
 </div>
 <div class="h-auto d-flex justify-content-center align-items-center" id="player_container">
 </div>`;
     pageDiv.append(gameScreenText);
-    newDeck(1).then((r) => new Game(r));
-    for (let i = 0; i < 5; i++) {
-        setTimeout(() => {
-            $("#countdown").text(`${5 - i}`);
-        }, 1000 * i);
-    }
-    setTimeout(() => { screenSwitch(mainScreen); }, 5000);
+    newDeck(1).then((r) => gameDebug = new Game(r));
+    $("#return-button").on("click", () => {
+        screenSwitch(mainScreen);
+    });
 }
 class LanguageTexts {
     constructor() {
@@ -203,7 +237,7 @@ function mainScreen() {
     }));
 }
 let language;
-let pageDiv = $("#page");
+const pageDiv = $("#page");
 getLanguage();
 function setLanguage(code) {
     switch (code) {
@@ -257,7 +291,10 @@ function fadeOutAndNext(nextScreen) {
     });
 }
 function errorMessageDeckOfCardsApi() {
-    let errorModal = `<div class="modal fade" tabindex="-1" id="error-modal">
+    let errorModal = `</div>
+<button data-bs-toggle="modal" data-bs-target="#error-modal" id="hidden-opener" hidden></button>
+</div>
+<div class="modal fade" tabindex="-1" id="error-modal">
 <div class="modal-dialog modal-dialog-centered">
 <div class="modal-content">
     <div class="modal-header">
@@ -270,11 +307,7 @@ function errorMessageDeckOfCardsApi() {
     <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">${language.ok}</button>
     </div>
-</div>
-</div>
-<button data-bs-toggle="modal" data-bs-target="#error-modal" id="hidden-opener" hidden></button>
-</div>
-`;
+</div>`;
     pageDiv.append(errorModal);
     $("#hidden-opener").click();
     let errorModalDiv = $("#error-modal");

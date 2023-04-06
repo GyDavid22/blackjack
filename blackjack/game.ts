@@ -8,18 +8,17 @@ class Game {
     public constructor(deck: DeckResponse) {
         this.deck = deck;
         this.remaining = deck.remaining;
-        this.putCardToContainer("PLAYER", 2).then(() => {
-            console.log(this.getHandValue(this.userHand));
-        });
-        this.putCardToContainer("DEALER", 2).then(() => {
-            console.log(this.getHandValue(this.dealerHand));
-        });
+        this.putCardToContainer("PLAYER", 2);
+        this.putCardToContainer("DEALER", 2);
     }
 
     private async pickCard(count: Number, hand: Array<Card>): Promise<Array<Card>> {
         let cards = new Array<Card>();
         await fetch(`https://deckofcardsapi.com/api/deck/${this.deck.deck_id}/draw/?count=${count}`)
             .then((r) => r.json() as Promise<CardResponse>).then((r) => {
+                if (this.remaining === r.remaining) {
+                    throw new Error(); // Probably we got the same response more times, happened during testing
+                }
                 this.remaining = this.remaining < r.remaining ? this.remaining : r.remaining;
                 for (let i = 0; i < r.cards.length; i++) {
                     hand.push(r.cards[i]);
@@ -27,6 +26,37 @@ class Game {
                 }
             }).catch(() => errorMessageDeckOfCardsApi());
         return cards;
+    }
+
+    public async hit() {
+        await this.putCardToContainer("PLAYER", 1);
+        let value = this.getHandValue(this.userHand);
+        if (value <= 21) {
+            // console.log(`You're good: ${value}`);
+        } else {
+            // console.log(`You're f*cked: ${value}`);
+        }
+    }
+
+    public async stand() {
+        this.dealerMove();
+    }
+
+    public async dealerMove() {
+        if (this.getHandValue(this.dealerHand) <= this.getHandValue(this.userHand) && this.getHandValue(this.dealerHand) < 21) {
+            setTimeout(async () => {
+                await this.putCardToContainer("DEALER", 1);
+                let value = this.getHandValue(this.dealerHand);
+                if (value <= 21) {
+                    console.log(`Dealer's good: ${value}`);
+                } else {
+                    console.log(`Dealer's f*cked: ${value}`);
+                }
+                this.dealerMove();
+            }, 1000);
+        } else {
+            console.log("Time to evaluate");
+        }
     }
 
     public async putCardToContainer(container: "DEALER" | "PLAYER", count: number) {
