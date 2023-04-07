@@ -97,9 +97,25 @@ class Game {
                     return;
             }
             let cards = yield this.pickCard(count, hand);
+            let loadedCount = 0;
+            let cardImgs = new Array();
             for (let i = 0; i < cards.length; i++) {
-                $(`#${container.toLowerCase()}_container`).append(`<img src="${cards[i].image}" class="animate__animated animate__${animation}" id="card_${this.cardCount}">`);
-                let me = $(`#card_${this.cardCount}`);
+                let cardImg = new Image();
+                cardImg.src = cards[i].image;
+                cardImg.classList.add("animate__animated", `animate__${animation}`);
+                cardImg.id = `card_${this.cardCount}`;
+                cardImg.title = `${cards[i].value} of ${cards[i].suit}`;
+                cardImgs.push(cardImg);
+                let myContainer = $(`#${container.toLowerCase()}_container`);
+                let me = $(cardImg);
+                me.on("load", () => {
+                    loadedCount++;
+                    if (loadedCount === cards.length) {
+                        for (let j = 0; j < cardImgs.length; j++) {
+                            myContainer.append(cardImgs[j]);
+                        }
+                    }
+                });
                 me.on("animationend", () => {
                     me.off();
                     me.removeClass(`animate__animated animate__${animation}`);
