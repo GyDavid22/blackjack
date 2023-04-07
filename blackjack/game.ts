@@ -1,7 +1,7 @@
 class Game {
     private deck: DeckResponse;
-    private userHand: Array<Card> = new Array<Card>();;
-    private dealerHand: Array<Card> = new Array<Card>();;
+    private userHand: Array<Card> = new Array<Card>();
+    private dealerHand: Array<Card> = new Array<Card>();
     private remaining: number;
     private cardCount: number = 0;
     private showFirst: boolean = false;
@@ -46,13 +46,13 @@ class Game {
         let value = this.getHandValue(this.userHand);
         if (value <= 21) {
             pageDiv.on("animationend", () => {
-                pageDiv.off();
+                pageDiv.off("animationend");
                 $("#hit-button").removeAttr("disabled");
                 $("#stand-button").removeAttr("disabled");
             });
         } else {
             pageDiv.on("animationend", () => {
-                pageDiv.off();
+                pageDiv.off("animationend");
                 $("#return-button").removeAttr("hidden");
             });
         }
@@ -81,7 +81,7 @@ class Game {
         } else {
             console.log("Time to evaluate");
             pageDiv.on("animationend", () => {
-                pageDiv.off();
+                pageDiv.off("animationend");
                 $("#return-button").removeAttr("hidden");
             });
         }
@@ -132,6 +132,7 @@ class Game {
                         myContainer.append(cardImgs[j]);
                     }
                 }
+                this.organize();
             });
             me.on("animationend", () => {
                 me.off();
@@ -170,5 +171,12 @@ class Game {
             }
         }
         return sumValue;
+    }
+
+    private organize() {
+        let playerContainer = $("#player_container");
+        for (let i = 0; i < playerContainer.children().length; i++) {
+            (playerContainer.children()[i] as HTMLImageElement).setAttribute("style", `transform: translateX(-${i/(playerContainer.children().length + 1)* 100}%);`)
+        }
     }
 }

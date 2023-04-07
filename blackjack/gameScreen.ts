@@ -2,7 +2,7 @@ let gameDebug: Game;
 
 function gameScreen(): void {
     let gameScreenText: string =
-`<div class="h-100 d-flex justify-content-center align-items-end card-container" id="dealer_container">
+`<div class="h-100 w-50 d-flex justify-content-center align-items-end card-container" id="dealer_container">
 </div>
 <div class="h-auto d-flex justify-content-center align-items-center my-2 control-container">
 <p id="dealer-value"></p>
@@ -11,7 +11,7 @@ function gameScreen(): void {
 <button type="button" class="btn btn-primary" id="stand-button" disabled>Stand</button>
 <p id="user-value"></p>
 </div>
-<div class="h-100 d-flex justify-content-center align-items-start card-container" id="player_container">
+<div class="h-100 w-50 d-flex justify-content-center align-items-start card-container" id="player_container">
 </div>`;
     pageDiv.append(gameScreenText);
     

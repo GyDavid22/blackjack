@@ -40,6 +40,8 @@ a:hover {
 .card-container > img {
     max-height: 100%;
     height: auto;
+    position: relative;
+    transition: 0.5s ease;
 }
 
 .card-container {
