@@ -151,7 +151,6 @@ class Game {
                             myContainer.append(cardImgs[j]);
                         }
                     }
-                    this.organize();
                 });
                 me.on("animationend", () => {
                     me.off();
@@ -194,16 +193,10 @@ class Game {
         }
         return sumValue;
     }
-    organize() {
-        let playerContainer = $("#player_container");
-        for (let i = 0; i < playerContainer.children().length; i++) {
-            playerContainer.children()[i].setAttribute("style", `transform: translateX(-${i / (playerContainer.children().length + 1) * 100}%);`);
-        }
-    }
 }
 let gameDebug;
 function gameScreen() {
-    let gameScreenText = `<div class="h-100 w-100 d-flex justify-content-center align-items-end card-container" id="dealer_container">
+    let gameScreenText = `<div class="h-100 d-flex justify-content-center align-items-end card-container" id="dealer_container">
 </div>
 <div class="h-auto d-flex justify-content-center align-items-center my-2 control-container">
 <p id="dealer-value"></p>
@@ -212,7 +205,7 @@ function gameScreen() {
 <button type="button" class="btn btn-primary" id="stand-button" disabled>Stand</button>
 <p id="user-value"></p>
 </div>
-<div class="h-100 w-100 d-flex justify-content-center align-items-start card-container" id="player_container">
+<div class="h-100 d-flex justify-content-center align-items-start card-container" id="player_container">
 </div>`;
     pageDiv.append(gameScreenText);
     newDeck(1).then((r) => {

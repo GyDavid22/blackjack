@@ -132,7 +132,6 @@ class Game {
                         myContainer.append(cardImgs[j]);
                     }
                 }
-                this.organize();
             });
             me.on("animationend", () => {
                 me.off();
@@ -171,12 +170,5 @@ class Game {
             }
         }
         return sumValue;
-    }
-
-    private organize() {
-        let playerContainer = $("#player_container");
-        for (let i = 0; i < playerContainer.children().length; i++) {
-            (playerContainer.children()[i] as HTMLImageElement).setAttribute("style", `transform: translateX(-${i/(playerContainer.children().length + 1)* 100}%);`)
-        }
     }
 }
