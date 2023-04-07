@@ -21,10 +21,20 @@ class Game {
         this.userHand = new Array();
         this.dealerHand = new Array();
         this.cardCount = 0;
+        this.showFirst = false;
         this.deck = deck;
         this.remaining = deck.remaining;
-        this.putCardToContainer("PLAYER", 2);
-        this.putCardToContainer("DEALER", 2);
+        this.hidden = document.createElement("img");
+        this.hiddenCard = {};
+        this.start();
+    }
+    start() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.putCardToContainer("PLAYER", 2);
+            yield this.putCardToContainer("DEALER", 2);
+            $("#hit-button").removeAttr("disabled");
+            $("#stand-button").removeAttr("disabled");
+        });
     }
     pickCard(count, hand) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -45,18 +55,31 @@ class Game {
     }
     hit() {
         return __awaiter(this, void 0, void 0, function* () {
+            $("#hit-button").attr("disabled", "");
+            $("#stand-button").attr("disabled", "");
             yield this.putCardToContainer("PLAYER", 1);
             let value = this.getHandValue(this.userHand);
             if (value <= 21) {
-                // console.log(`You're good: ${value}`);
+                pageDiv.on("animationend", () => {
+                    pageDiv.off();
+                    $("#hit-button").removeAttr("disabled");
+                    $("#stand-button").removeAttr("disabled");
+                });
             }
             else {
-                // console.log(`You're f*cked: ${value}`);
+                pageDiv.on("animationend", () => {
+                    pageDiv.off();
+                    $("#return-button").removeAttr("hidden");
+                });
             }
         });
     }
     stand() {
         return __awaiter(this, void 0, void 0, function* () {
+            this.showFirst = true;
+            this.hidden.src = this.hiddenCard.image;
+            $("#hit-button").attr("disabled", "");
+            $("#stand-button").attr("disabled", "");
             this.dealerMove();
         });
     }
@@ -77,6 +100,10 @@ class Game {
             }
             else {
                 console.log("Time to evaluate");
+                pageDiv.on("animationend", () => {
+                    pageDiv.off();
+                    $("#return-button").removeAttr("hidden");
+                });
             }
         });
     }
@@ -96,6 +123,10 @@ class Game {
                 default:
                     return;
             }
+            let musthide = false;
+            if (!this.showFirst && this.dealerHand.length === 0 && container === "DEALER") {
+                musthide = true;
+            }
             let cards = yield this.pickCard(count, hand);
             let loadedCount = 0;
             let cardImgs = new Array();
@@ -105,6 +136,13 @@ class Game {
                 cardImg.classList.add("animate__animated", `animate__${animation}`);
                 cardImg.id = `card_${this.cardCount}`;
                 cardImg.title = `${cards[i].value} of ${cards[i].suit}`;
+                if (musthide) {
+                    cardImg.src = "https://deckofcardsapi.com/static/img/back.png";
+                    cardImg.title = "";
+                    this.hidden = cardImg;
+                    this.hiddenCard = cards[i];
+                    musthide = false;
+                }
                 cardImgs.push(cardImg);
                 let myContainer = $(`#${container.toLowerCase()}_container`);
                 let me = $(cardImg);
@@ -122,6 +160,12 @@ class Game {
                 });
                 this.cardCount++;
             }
+            if (container === "DEALER") {
+                $("#dealer-value").text(`/\\ ${this.getHandValue(this.dealerHand)}`);
+            }
+            else {
+                $("#user-value").text(`\\/ ${this.getHandValue(this.userHand)}`);
+            }
         });
     }
     getHandValue(hand) {
@@ -138,6 +182,9 @@ class Game {
             else {
                 sumValue += Number.parseInt(hand[i].value);
             }
+            if (!this.showFirst && hand === this.dealerHand && i === 0) {
+                sumValue = 0;
+            }
         }
         if (sumValue > 21) {
             let i = 0;
@@ -151,15 +198,27 @@ class Game {
 }
 let gameDebug;
 function gameScreen() {
-    let gameScreenText = `<div class="h-auto d-flex justify-content-center align-items-center" id="dealer_container">
+    let gameScreenText = `<div class="h-100 d-flex justify-content-center align-items-end card-container" id="dealer_container">
 </div>
-<div class="h-100 d-flex justify-content-center align-items-center">
-<button type="button" class="btn btn-primary" id="return-button">Return</button>
+<div class="h-auto d-flex justify-content-center align-items-center my-2 control-container">
+<p id="dealer-value"></p>
+<button type="button" class="btn btn-primary" id="hit-button" disabled>Hit</button>
+<button type="button" class="btn btn-primary" id="return-button" hidden>Return</button>
+<button type="button" class="btn btn-primary" id="stand-button" disabled>Stand</button>
+<p id="user-value"></p>
 </div>
-<div class="h-auto d-flex justify-content-center align-items-center" id="player_container">
+<div class="h-100 d-flex justify-content-center align-items-start card-container" id="player_container">
 </div>`;
     pageDiv.append(gameScreenText);
-    newDeck(1).then((r) => gameDebug = new Game(r));
+    newDeck(1).then((r) => {
+        gameDebug = new Game(r);
+        $("#hit-button").on("click", () => {
+            gameDebug.hit();
+        });
+        $("#stand-button").on("click", () => {
+            gameDebug.stand();
+        });
+    });
     $("#return-button").on("click", () => {
         screenSwitch(mainScreen);
     });
@@ -211,7 +270,7 @@ function mainScreen() {
     </select>
 </div>
 </header>
-<div class="h-100 d-flex justify-content-center align-items-center">
+<div class="flex-grow-1 d-flex justify-content-center align-items-center">
 <button type="button" class="btn btn-primary" id="start-game-button">${language.startGame}</button>
 </div>
 <footer class="d-flex h-auto w-100">

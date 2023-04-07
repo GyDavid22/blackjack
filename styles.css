@@ -3,6 +3,10 @@ body {
     color: antiquewhite;
 }
 
+.page {
+    overflow: hidden;
+}
+
 .modal {
     color: black;
 }
@@ -26,4 +30,25 @@ a:hover {
 
 :root {
     --animate-duration: 500ms;
+}
+
+.control-container > {
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.card-container > img {
+    max-height: 100%;
+    height: auto;
+}
+
+.card-container {
+    overflow: hidden;
+    max-width: 100%;
+    --animate-duration: 250ms;
+}
+
+.control-container > button {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
 }

@@ -4,12 +4,23 @@ class Game {
     private dealerHand: Array<Card> = new Array<Card>();;
     private remaining: number;
     private cardCount: number = 0;
+    private showFirst: boolean = false;
+    private hidden: HTMLImageElement;
+    private hiddenCard: Card;
 
     public constructor(deck: DeckResponse) {
         this.deck = deck;
         this.remaining = deck.remaining;
+        this.hidden = document.createElement("img") as HTMLImageElement;
+        this.hiddenCard = {} as Card;
+        this.start();
+    }
+
+    private async start() {
         this.putCardToContainer("PLAYER", 2);
-        this.putCardToContainer("DEALER", 2);
+        await this.putCardToContainer("DEALER", 2);
+        $("#hit-button").removeAttr("disabled");
+        $("#stand-button").removeAttr("disabled");
     }
 
     private async pickCard(count: Number, hand: Array<Card>): Promise<Array<Card>> {
@@ -29,16 +40,29 @@ class Game {
     }
 
     public async hit() {
+        $("#hit-button").attr("disabled", "");
+        $("#stand-button").attr("disabled", "");
         await this.putCardToContainer("PLAYER", 1);
         let value = this.getHandValue(this.userHand);
         if (value <= 21) {
-            // console.log(`You're good: ${value}`);
+            pageDiv.on("animationend", () => {
+                pageDiv.off();
+                $("#hit-button").removeAttr("disabled");
+                $("#stand-button").removeAttr("disabled");
+            });
         } else {
-            // console.log(`You're f*cked: ${value}`);
+            pageDiv.on("animationend", () => {
+                pageDiv.off();
+                $("#return-button").removeAttr("hidden");
+            });
         }
     }
 
     public async stand() {
+        this.showFirst = true;
+        this.hidden.src = this.hiddenCard.image;
+        $("#hit-button").attr("disabled", "");
+        $("#stand-button").attr("disabled", "");
         this.dealerMove();
     }
 
@@ -56,6 +80,10 @@ class Game {
             }, 1000);
         } else {
             console.log("Time to evaluate");
+            pageDiv.on("animationend", () => {
+                pageDiv.off();
+                $("#return-button").removeAttr("hidden");
+            });
         }
     }
 
@@ -74,6 +102,10 @@ class Game {
             default:
                 return;
         }
+        let musthide = false;
+        if (!this.showFirst && this.dealerHand.length === 0 && container === "DEALER") {
+            musthide = true;
+        }
         let cards = await this.pickCard(count, hand);
         let loadedCount = 0;
         let cardImgs = new Array<HTMLImageElement>();
@@ -83,6 +115,13 @@ class Game {
             cardImg.classList.add("animate__animated", `animate__${animation}`);
             cardImg.id = `card_${this.cardCount}`;
             cardImg.title = `${cards[i].value} of ${cards[i].suit}`;
+            if (musthide) {
+                cardImg.src = "https://deckofcardsapi.com/static/img/back.png";
+                cardImg.title = "";
+                this.hidden = cardImg;
+                this.hiddenCard = cards[i];
+                musthide = false;
+            }
             cardImgs.push(cardImg);
             let myContainer = $(`#${container.toLowerCase()}_container`);
             let me = $(cardImg);
@@ -100,6 +139,11 @@ class Game {
             });
             this.cardCount++;
         }
+        if (container === "DEALER") {
+            $("#dealer-value").text(`/\\ ${this.getHandValue(this.dealerHand)}`);
+        } else {
+            $("#user-value").text(`\\/ ${this.getHandValue(this.userHand)}`);
+        }
     }
 
     public getHandValue(hand: Array<Card>): number {
@@ -113,6 +157,9 @@ class Game {
                 aces++;
             } else {
                 sumValue += Number.parseInt(hand[i].value);
+            }
+            if (!this.showFirst && hand === this.dealerHand && i === 0) {
+                sumValue = 0;
             }
         }
         if (sumValue > 21) {
